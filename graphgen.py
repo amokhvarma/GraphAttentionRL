@@ -3,7 +3,7 @@ import numpy as np
 from torch_geometric.data import Data
 from torch_geometric.utils.sparse import dense_to_sparse
 import cv2
-from model import GAT
+from model import GAT,CNN
 def make_graph(state,target_dim = 50, type = "full" ):
     x = np.zeros((target_dim*target_dim,3))
     img = cv2.resize(state,(target_dim,target_dim))
@@ -19,7 +19,8 @@ def make_graph(state,target_dim = 50, type = "full" ):
     adj_tensor = torch.tensor(adj,dtype=torch.long)
     x = torch.tensor(x,dtype=torch.float32)
     edge_index,_ = dense_to_sparse(adj_tensor)
-    data = Data(x=x,edge_index=edge_index,complete=img)
+    img = np.reshape(img,(3,target_dim,target_dim))
+    data = Data(x=x,edge_index=edge_index,complete=torch.tensor(img,dtype=torch.float32))
     return data
 
 
@@ -27,6 +28,6 @@ def make_graph(state,target_dim = 50, type = "full" ):
 if __name__ == '__main__':
     a = np.random.randn(60,60,3)
     t = make_graph(a,50)
-    model = GAT()
+    model = CNN()
     model.train()
     print(model(t).detach().numpy())

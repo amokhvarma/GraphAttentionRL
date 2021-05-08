@@ -80,3 +80,30 @@ class GAT(torch.nn.Module):
         x = self.flat(x)
         x = self.fc(x)
         return F.log_softmax(x, dim=-1)
+
+class CNN(torch.nn.Module):
+    def __init__(self):
+        super(CNN,self).__init__()
+        self.hidden_layers = 2
+        self.input_dim = 50
+        self.stride = 1
+        self.conv1 = torch.nn.Conv2d(3,64,kernel_size = (3,3),stride = (self.stride,self.stride))
+        self.pool1 = torch.nn.MaxPool2d((2,2))
+        self.conv2 = torch.nn.Conv2d(64,64,kernel_size = (3,3),stride = (self.stride,self.stride))
+        self.pool2 = torch.nn.MaxPool2d((2,2))
+        self.flat = torch.nn.Flatten(0,-1)
+        self.fc = torch.nn.Linear(in_features=7744,out_features= 4)
+
+    def forward(self,data):
+        img = data.complete
+        img = img.unsqueeze(0)
+        x = self.conv1(img)
+        x = self.pool1(x)
+        x = F.relu(x)
+        x = self.conv2(x)
+        x = self.pool2(x)
+        x = F.relu(x)
+        x = self.flat(x)
+        x = self.fc(x)
+        return F.log_softmax(x,dim=-1)
+

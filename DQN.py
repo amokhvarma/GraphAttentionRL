@@ -1,5 +1,5 @@
 import torch
-from model import GAT
+from model import GAT,CNN
 import random
 import numpy as np
 from collections import deque
@@ -14,6 +14,8 @@ class DQN():
         self.memory = deque(maxlen=2000)
         if(type=="GAT"):
             self.model = GAT()
+        elif(type=="CNN"):
+            self.model = CNN()
 
         self.learning_rate = 0.01
         self.optimizer = optim.Adam(self.model.parameters(),lr=self.learning_rate)
@@ -66,7 +68,7 @@ class DQN():
         self.model.load_weights(path)
 
 if __name__ == "__main__":
-    Agent = DQN()
+    Agent = DQN(type="CNN")
     for i in range(1,100):
         a = np.random.randn(60,60,3)
         b = np.random.randn(60,60,3)
