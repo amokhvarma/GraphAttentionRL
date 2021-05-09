@@ -53,12 +53,12 @@ class GATLayer(nn.Module):
 class GAT(torch.nn.Module):
     def __init__(self):
         super(GAT, self).__init__()
-        self.hid = 8
+        self.hid = 12
         self.input_dim = 50
         self.in_head = 8
         self.out_head = 1
         self.num_features = 3
-        self.conv_output = 4
+        self.conv_output = 8
         self.conv1 = GATConv(self.num_features, self.hid, heads=self.in_head, dropout=0.6)
         self.conv2 = GATConv(self.hid * self.in_head, self.conv_output, concat=False,
                              heads=self.out_head, dropout=0.6)
