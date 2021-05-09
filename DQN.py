@@ -17,7 +17,7 @@ class DQN():
         elif(type=="CNN"):
             self.model = CNN()
 
-        self.learning_rate = 0.01
+        self.learning_rate = 0.1
         self.optimizer = optim.Adam(self.model.parameters(),lr=self.learning_rate)
         self.epsilon = 1
         self.epsilon_decay = 0.995
@@ -73,7 +73,7 @@ class DQN():
 
 if __name__ == "__main__":
     Agent = DQN(type="GAT")
-    for i in range(1,41):
+    for i in range(1,100):
         a = np.random.randn(60,60,3)
         b = np.random.randn(60,60,3)
         t_a = make_graph(a,50)
@@ -85,4 +85,4 @@ if __name__ == "__main__":
         if(i%40==0):
             print(Agent.replay())
 
-    print(Agent.model.attention[1].shape)
+    print(Agent.model.attention[1][7],Agent.model.attention[0])

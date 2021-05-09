@@ -27,6 +27,7 @@ all_rewards = []
 batch_size = args.batch_size
 total_episode = 0
 loss_total = []
+y_1,y_2,y_3=[],[],[]
 for i in range(0,number_of_games):
     env = gym.make("MsPacman-v0")
     state = env.reset()
@@ -48,14 +49,16 @@ for i in range(0,number_of_games):
             loss_total.append(loss)
 
 
-    print("Game number - ", i+1, " This Game Episodes - ", this_game_episodes, " This game Average reward - ", sum(reward_arr)/ this_game_episodes)
-    all_rewards.append(sum(reward_arr)/ this_game_episodes)
+    print("Game number - ", i+1, " This Game Episodes - ", this_game_episodes, "  Gamewise Average reward - ", sum(reward_arr)/ this_game_episodes)
+    all_rewards.append(sum(reward_arr[-100:]))
     all_episodes.append(this_game_episodes)
+    y_1.append(np.mean(all_rewards))
+    y_2.append(np.mean(all_episodes))
+    y_3.append(np.mean(loss_total))
     if(i != 0 and i % args.replay == 0):
-        y_1 = all_rewards
-        y_2 = all_episodes
-        y_3 = loss_total
-        print(y_1,y_2)
+        # y_1 = all_rewards
+        # y_2 = all_episodes
+        # y_3 = loss_total
         # plotting reward evolution
         plt.plot(y_1)
         plt.xlabel('Number of games')

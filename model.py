@@ -121,9 +121,9 @@ class GCN(torch.nn.Module):
         self.hid = 8
         self.input_dim = 50
         self.num_features = 3
-        self.conv_output = 4
-        self.conv1 = GCNConv(self.num_features,self.hid, dropout=0.6)
-        self.conv2 = GCNConv(self.hid , self.conv_output, dropout=0.6)
+        self.conv_output = 8
+        self.conv1 = GCNConv(self.num_features,self.hid, dropout=0.2)
+        self.conv2 = GCNConv(self.hid , self.conv_output, dropout=0.2)
         self.flat = torch.nn.Flatten(0,-1)
         self.fc = torch.nn.Linear(in_features = self.conv_output*self.input_dim**2,out_features=4)
 
@@ -136,7 +136,7 @@ class GCN(torch.nn.Module):
         #x = F.dropout(x, p=0.6, training=self.training)
         x = self.conv1(x, edge_index)
         x = F.elu(x)
-        x = F.dropout(x, p=0.6, training=self.training)
+        x = F.dropout(x, p=0.2, training=self.training)
         x = self.conv2(x, edge_index)
         x = F.elu(x)
         x = self.flat(x)
