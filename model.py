@@ -79,9 +79,7 @@ class GAT(torch.nn.Module):
         # One can skip them if the dataset is sufficiently large.
 
         x = F.dropout(x, p=0.6, training=self.training)
-        print(x.shape)
         x,self.attention = self.conv1(x, edge_index,return_attention_weights=True)
-        print(x.shape)
         x = F.elu(x)
         x = F.dropout(x, p=0.6, training=self.training)
         x = self.conv2(x, edge_index)

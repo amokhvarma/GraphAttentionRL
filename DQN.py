@@ -63,11 +63,11 @@ class DQN():
 
         return loss.item()
 
-    def save(self,path="GAT"):
-        self.model.save_weights(path)
+    def save(self,path="Models/GAT"):
+        torch.save(self.model,path)
 
-    def load(self,path="GAT"):
-        self.model.load_weights(path)
+    def load(self,path="Models/GAT"):
+        self.model = torch.load(path)
 
 if __name__ == "__main__":
     Agent = DQN(type="GAT")
