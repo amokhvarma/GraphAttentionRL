@@ -68,8 +68,8 @@ class DQN():
         self.model.load_weights(path)
 
 if __name__ == "__main__":
-    Agent = DQN(type="CNN")
-    for i in range(1,100):
+    Agent = DQN(type="GAT")
+    for i in range(1,41):
         a = np.random.randn(60,60,3)
         b = np.random.randn(60,60,3)
         t_a = make_graph(a,50)
@@ -80,3 +80,5 @@ if __name__ == "__main__":
         Agent.remember(t_a,action,r,t_b,done)
         if(i%40==0):
             print(Agent.replay())
+
+    print(Agent.model.attention[1].shape)

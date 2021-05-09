@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import GATConv
+from torch_geometric.nn import GATConv,GCNConv,SAGEConv
 
 class GATLayer(nn.Module):
     """
@@ -53,17 +53,18 @@ class GATLayer(nn.Module):
 class GAT(torch.nn.Module):
     def __init__(self):
         super(GAT, self).__init__()
-        self.hid = 8
+        self.hid = 10
         self.input_dim = 50
         self.in_head = 8
         self.out_head = 1
         self.num_features = 3
         self.conv_output = 4
+        self.attention = None
         self.conv1 = GATConv(self.num_features, self.hid, heads=self.in_head, dropout=0.6)
         self.conv2 = GATConv(self.hid * self.in_head, self.conv_output, concat=False,
                              heads=self.out_head, dropout=0.6)
         self.flat = torch.nn.Flatten(0,-1)
-        self.fc = torch.nn.Linear(in_features = 4*self.input_dim**2,out_features=4)
+        self.fc = torch.nn.Linear(in_features = self.conv_output*self.input_dim**2,out_features=4)
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
@@ -72,7 +73,9 @@ class GAT(torch.nn.Module):
         # One can skip them if the dataset is sufficiently large.
 
         x = F.dropout(x, p=0.6, training=self.training)
-        x = self.conv1(x, edge_index)
+        print(x.shape)
+        x,self.attention = self.conv1(x, edge_index,return_attention_weights=True)
+        print(x.shape)
         x = F.elu(x)
         x = F.dropout(x, p=0.6, training=self.training)
         x = self.conv2(x, edge_index)
@@ -88,9 +91,9 @@ class CNN(torch.nn.Module):
         self.input_dim = 50
         self.stride = 1
         self.conv1 = torch.nn.Conv2d(3,64,kernel_size = (3,3),stride = (self.stride,self.stride))
-        self.pool1 = torch.nn.MaxPool2d((2,2))
+        self.pool1 = torch.nn.MaxPool2d((2,2),stride=2)
         self.conv2 = torch.nn.Conv2d(64,64,kernel_size = (3,3),stride = (self.stride,self.stride))
-        self.pool2 = torch.nn.MaxPool2d((2,2))
+        self.pool2 = torch.nn.MaxPool2d((2,2),stride=2)
         self.flat = torch.nn.Flatten(0,-1)
         self.fc = torch.nn.Linear(in_features=7744,out_features= 4)
 
@@ -107,3 +110,61 @@ class CNN(torch.nn.Module):
         x = self.fc(x)
         return F.log_softmax(x,dim=-1)
 
+
+class GCN(torch.nn.Module):
+    def __init__(self):
+        super(GCN, self).__init__()
+        self.hid = 8
+        self.input_dim = 50
+        self.num_features = 3
+        self.conv_output = 4
+        self.conv1 = GCNConv(self.num_features,self.hid, dropout=0.6)
+        self.conv2 = GCNConv(self.hid , self.conv_output, dropout=0.6)
+        self.flat = torch.nn.Flatten(0,-1)
+        self.fc = torch.nn.Linear(in_features = self.conv_output*self.input_dim**2,out_features=4)
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+
+        # Dropout before the GAT layer is used to avoid overfitting in small datasets like Cora.
+        # One can skip them if the dataset is sufficiently large.
+
+        #x = F.dropout(x, p=0.6, training=self.training)
+        x = self.conv1(x, edge_index)
+        x = F.elu(x)
+        x = F.dropout(x, p=0.6, training=self.training)
+        x = self.conv2(x, edge_index)
+        x = F.elu(x)
+        x = self.flat(x)
+        x = self.fc(x)
+        return F.log_softmax(x, dim=-1)
+
+
+
+class SAGE(torch.nn.Module):
+    def __init__(self):
+        super(SAGE, self).__init__()
+        self.hid = 8
+        self.input_dim = 50
+        self.num_features = 3
+        self.conv_output = 4
+        self.conv1 = SAGEConv(self.num_features,self.hid, dropout=0.6)
+        self.conv2 = SAGEConv(self.hid , self.conv_output, dropout=0.6)
+        self.flat = torch.nn.Flatten(0,-1)
+        self.fc = torch.nn.Linear(in_features = self.conv_output*self.input_dim**2,out_features=4)
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+
+        # Dropout before the GAT layer is used to avoid overfitting in small datasets like Cora.
+        # One can skip them if the dataset is sufficiently large.
+
+        #x = F.dropout(x, p=0.6, training=self.training)
+        x = self.conv1(x, edge_index)
+        x = F.elu(x)
+        x = F.dropout(x, p=0.6, training=self.training)
+        x = self.conv2(x, edge_index)
+        x = F.elu(x)
+        x = self.flat(x)
+        x = self.fc(x)
+        return F.log_softmax(x, dim=-1)
