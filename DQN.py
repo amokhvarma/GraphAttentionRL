@@ -24,6 +24,8 @@ class DQN():
         self.epsilon_min = 0.1
         self.gamma = 0.95
         self.loss = deque(maxlen=100)
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model.to(device)
 
     def remember(self,state,action,reward,next_state,done):
         self.memory.append({'state':state,'action':action,'reward':reward,"next":next_state,'done':done})
@@ -47,7 +49,7 @@ class DQN():
         for mem in minibatch:
            target = torch.tensor(mem['reward'],dtype=torch.float32)
            if(not mem['done']):
-               target = torch.tensor(mem['reward'] + self.gamma*(np.max(self.model(mem['next']).detach().numpy())),dtype=torch.float32)
+               target = torch.tensor(mem['reward'] + self.gamma*(np.max(self.model(mem['next']).detach().numpy())-15),dtype=torch.float32)
 
            pred = self.model(mem['state'])[mem['action']]
            loss+=F.mse_loss(pred,target)
