@@ -21,7 +21,7 @@ if(not os.path.isdir("Models")):
     os.mkdir("Models")
 
 number_of_games = args.number_of_games
-Agent = DQN('GAT')
+Agent = DQN(type='CNN')
 all_episodes = []
 all_rewards = []
 batch_size = args.batch_size
@@ -39,6 +39,13 @@ for i in range(0,number_of_games):
         feat1 = make_graph(old_state,50)
         action = Agent.act(feat1)
         (next_state,reward,done,info) = env.step(action)
+        #print(reward)
+        if(reward==10):
+            reward = 0.3
+        elif(reward==0 and not done):
+            reward = 0.1
+        else:
+            reward = 0
         feat2 = make_graph(next_state,50)
         Agent.remember(feat1,action,reward,feat2,done)
         this_game_episodes+=1
@@ -47,6 +54,7 @@ for i in range(0,number_of_games):
         if(total_episode % batch_size == 0):
             loss = Agent.replay(batch_size)
             loss_total.append(loss)
+
 
 
     print("Game number - ", i+1, " This Game Episodes - ", this_game_episodes, "  Gamewise Average reward - ", sum(reward_arr)/ this_game_episodes)

@@ -17,7 +17,7 @@ class DQN():
         elif(type=="CNN"):
             self.model = CNN()
 
-        self.learning_rate = 0.1
+        self.learning_rate = 0.001
         self.optimizer = optim.Adam(self.model.parameters(),lr=self.learning_rate)
         self.epsilon = 1
         self.epsilon_decay = 0.995
@@ -51,7 +51,7 @@ class DQN():
            target = torch.tensor(mem['reward'],dtype=torch.float32).to(self.device)
            if(not mem['done']):
                with torch.no_grad():
-                  target = torch.tensor(mem['reward'] + self.gamma*(np.max(self.model(mem['next']).detach().cpu().numpy())-15),dtype=torch.float32).to(self.device)
+                  target = torch.tensor(mem['reward'] + self.gamma*(np.max(self.model(mem['next']).detach().cpu().numpy())),dtype=torch.float32).to(self.device)
 
            pred = self.model(mem['state'])[mem['action']].to(self.device)
            loss+=F.mse_loss(pred,target)
@@ -72,7 +72,7 @@ class DQN():
         self.model = torch.load(path)
 
 if __name__ == "__main__":
-    Agent = DQN(type="GAT")
+    Agent = DQN(type="CNN")
     for i in range(1,100):
         a = np.random.randn(60,60,3)
         b = np.random.randn(60,60,3)
@@ -85,4 +85,4 @@ if __name__ == "__main__":
         if(i%40==0):
             print(Agent.replay())
 
-    print(Agent.model.attention[1][7],Agent.model.attention[0])
+    #print(Agent.model.attention[1][7],Agent.model.attention[0])

@@ -105,13 +105,18 @@ class CNN(torch.nn.Module):
         img = data.complete
         img = img.unsqueeze(0)
         x = self.conv1(img)
+        #print(x.shape)
         x = self.pool1(x)
-        x = F.relu(x)
+        #x = F.relu(x)
         x = self.conv2(x)
+        #print(x.shape)
         x = self.pool2(x)
+        #print(x.shape)
         x = F.relu(x)
         x = self.flat(x)
+        #print(x.shape)
         x = self.fc(x)
+        #print("Success")
         return F.log_softmax(x,dim=-1)
 
 
