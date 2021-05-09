@@ -33,7 +33,7 @@ class DQN():
 
     def act(self,state):
         if(np.random.uniform(0,1) < self.epsilon):
-            return random.sample([0,1,2,3],1)[0]
+            return random.sample([0,1,2,3,4],1)[0]
 
         self.model.eval()
         with torch.no_grad():
@@ -56,6 +56,7 @@ class DQN():
            pred = self.model(mem['state'])[mem['action']].to(self.device)
            loss+=F.mse_loss(pred,target)
 
+
         loss = loss/batch_size
         loss.backward()
         self.optimizer.step()
@@ -72,12 +73,12 @@ class DQN():
         self.model = torch.load(path)
 
 if __name__ == "__main__":
-    Agent = DQN(type="CNN")
+    Agent = DQN(type="GAT")
     for i in range(1,100):
-        a = np.random.randn(60,60,3)
-        b = np.random.randn(60,60,3)
-        t_a = make_graph(a,50)
-        t_b = make_graph(b,50)
+        a = np.random.randn(100,60,3)
+        b = np.random.randn(100,60,3)
+        t_a = make_graph(a,30)
+        t_b = make_graph(b,30)
         r = np.random.uniform(0,1)
         done = False
         action = random.sample([0,1,2,3],1)[0]
@@ -85,4 +86,4 @@ if __name__ == "__main__":
         if(i%40==0):
             print(Agent.replay())
 
-    #print(Agent.model.attention[1][7],Agent.model.attention[0])
+    print(Agent.model.attention[1].shape,Agent.model.attention[0])

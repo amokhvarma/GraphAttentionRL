@@ -6,6 +6,7 @@ import cv2
 from model import GAT,CNN
 def make_graph(state,target_dim = 50, type = "full" ):
     x = np.zeros((target_dim*target_dim,3))
+
     img = cv2.resize(state,(target_dim,target_dim))
     adj = np.ones((target_dim,target_dim))
     for i in range(0,target_dim):
@@ -21,7 +22,7 @@ def make_graph(state,target_dim = 50, type = "full" ):
     edge_index,_ = dense_to_sparse(adj_tensor)
     img = np.reshape(img,(3,target_dim,target_dim))
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    data = Data(x=x,edge_index=edge_index,complete=torch.tensor(img,dtype=torch.float32)).to(device)
+    data = Data(x=x,edge_index=edge_index,complete=torch.tensor(img/255,dtype=torch.float32)).to(device)
     return data
 
 

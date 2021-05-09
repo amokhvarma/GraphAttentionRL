@@ -70,8 +70,7 @@ class GAT(torch.nn.Module):
         self.conv2 = GATConv(self.hid * self.in_head, self.conv_output, concat=False,
                              heads=self.out_head, dropout=0.6)
         self.flat = torch.nn.Flatten(0,-1)
-        self.fc = torch.nn.Linear(in_features = self.conv_output*self.input_dim**2,out_features=4)
-
+        self.fc = torch.nn.Linear(in_features = self.conv_output*self.input_dim**2,out_features=5)
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
 
@@ -86,7 +85,8 @@ class GAT(torch.nn.Module):
         x = F.elu(x)
         x = self.flat(x)
         x = self.fc(x)
-        return F.log_softmax(x, dim=-1)
+        return x
+        #return F.log_softmax(x, dim=-1)
 
 class CNN(torch.nn.Module):
     def __init__(self):
@@ -98,8 +98,10 @@ class CNN(torch.nn.Module):
         self.pool1 = torch.nn.MaxPool2d((2,2),stride=2)
         self.conv2 = torch.nn.Conv2d(64,64,kernel_size = (3,3),stride = (self.stride,self.stride))
         self.pool2 = torch.nn.MaxPool2d((2,2),stride=2)
+        self.conv3 = torch.nn.Conv2d(64,16,kernel_size = (3,3),stride = (self.stride,self.stride))
+        self.pool3 = torch.nn.MaxPool2d((2,2),stride=2)
         self.flat = torch.nn.Flatten(0,-1)
-        self.fc = torch.nn.Linear(in_features=7744,out_features= 4)
+        self.fc = torch.nn.Linear(in_features=256,out_features= 5)
 
     def forward(self,data):
         img = data.complete
@@ -107,17 +109,21 @@ class CNN(torch.nn.Module):
         x = self.conv1(img)
         #print(x.shape)
         x = self.pool1(x)
-        #x = F.relu(x)
+        x = F.relu(x)
         x = self.conv2(x)
         #print(x.shape)
         x = self.pool2(x)
         #print(x.shape)
         x = F.relu(x)
+        x = self.conv3(x)
+        x = self.pool3(x)
+        x = F.relu(x)
         x = self.flat(x)
         #print(x.shape)
         x = self.fc(x)
         #print("Success")
-        return F.log_softmax(x,dim=-1)
+        return x
+        #return F.log_softmax(x,dim=-1)
 
 
 class GCN(torch.nn.Module):

@@ -21,7 +21,7 @@ if(not os.path.isdir("Models")):
     os.mkdir("Models")
 
 number_of_games = args.number_of_games
-Agent = DQN(type='CNN')
+Agent = DQN(type='GAT')
 all_episodes = []
 all_rewards = []
 batch_size = args.batch_size
@@ -38,6 +38,7 @@ for i in range(0,number_of_games):
         old_state = state
         feat1 = make_graph(old_state,50)
         action = Agent.act(feat1)
+        print(action)
         (next_state,reward,done,info) = env.step(action)
         #print(reward)
         if(reward==10):
@@ -46,6 +47,7 @@ for i in range(0,number_of_games):
             reward = 0.1
         else:
             reward = 0
+        state = next_state
         feat2 = make_graph(next_state,50)
         Agent.remember(feat1,action,reward,feat2,done)
         this_game_episodes+=1
@@ -57,16 +59,17 @@ for i in range(0,number_of_games):
 
 
 
-    print("Game number - ", i+1, " This Game Episodes - ", this_game_episodes, "  Gamewise Average reward - ", sum(reward_arr)/ this_game_episodes)
+    print("Game number - ", i+1, " This Game Episodes - ", this_game_episodes, "  Gamewise Average reward - ", sum(reward_arr), "Loss : ", np.mean(loss_total))
     all_rewards.append(sum(reward_arr[-100:]))
     all_episodes.append(this_game_episodes)
-    y_1.append(np.mean(all_rewards))
-    y_2.append(np.mean(all_episodes))
-    y_3.append(np.mean(loss_total))
+    if(i >= 9):
+        y_1.append(np.mean(all_rewards))
+        y_2.append(np.mean(all_episodes))
+        y_3.append(np.mean(loss_total))
     if(i != 0 and i % args.replay == 0):
-        # y_1 = all_rewards
-        # y_2 = all_episodes
-        # y_3 = loss_total
+        y_1 = all_rewards
+        y_2 = all_episodes
+        y_3 = loss_total
         # plotting reward evolution
         plt.plot(y_1)
         plt.xlabel('Number of games')
