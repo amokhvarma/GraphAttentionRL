@@ -3,10 +3,20 @@ from DQN import DQN
 import numpy as np
 from graphgen import make_graph
 
-number_of_games = 1
+# args
+from argparse import ArgumentParser
+parser = ArgumentParser()
+# adding arguments
+parser.add_argument('--number_of_games', dest='number_of_games', default=1, type=int,
+                    help='game_num?')
+parser.add_argument('--batch_size', dest='batch_size', default=32, type=int,
+                    help='batch_size?')
+args = parser.parse_args()
+
+number_of_games = args.number_of_games
 Agent = DQN()
 total_episodes = 0
-batch_size = 32
+batch_size = args.batch_size
 for i in range(0,number_of_games):
     env = gym.make("MsPacman-v0")
     state = env.reset()
