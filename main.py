@@ -19,7 +19,7 @@ if(not os.path.isdir("Results")):
     os.mkdir("Results")
 if(not os.path.isdir("Models")):
     os.mkdir("Models")
-    
+
 number_of_games = args.number_of_games
 Agent = DQN('GAT')
 all_episodes = []

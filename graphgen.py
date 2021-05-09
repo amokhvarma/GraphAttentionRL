@@ -20,7 +20,8 @@ def make_graph(state,target_dim = 50, type = "full" ):
     x = torch.tensor(x,dtype=torch.float32)
     edge_index,_ = dense_to_sparse(adj_tensor)
     img = np.reshape(img,(3,target_dim,target_dim))
-    data = Data(x=x,edge_index=edge_index,complete=torch.tensor(img,dtype=torch.float32))
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    data = Data(x=x,edge_index=edge_index,complete=torch.tensor(img,dtype=torch.float32)).to(device)
     return data
 
 
