@@ -4,6 +4,8 @@ from torch_geometric.data import Data
 from torch_geometric.utils.sparse import dense_to_sparse
 import cv2
 from model import GAT,CNN
+import torch.nn.functional as F
+
 def make_graph(state,target_dim = 50, type = "full" ):
     x = np.zeros((target_dim*target_dim,3))
 
@@ -25,6 +27,27 @@ def make_graph(state,target_dim = 50, type = "full" ):
     data = Data(x=x,edge_index=edge_index,complete=torch.tensor(img/255,dtype=torch.float32)).to(device)
     return data
 
+def attention_calc(alpha_l,alpha_r,i):
+    n = alpha_l.shape[0]
+    n = int(n)
+    mat = np.zeros((n,n))
+    temp = np.random.randn(10,10)
+    dummy_weights = []
+    left = alpha_l[i]
+    with torch.no_grad():
+        for j in range(0,n):
+
+             if(not j==i):
+                 dummy_weights.append(F.leaky_relu(negative_slope=0.02,input = left+alpha_r[j]))
+             else:
+                 dummy_weights.append(0)
+        s = sum(dummy_weights)
+        dummy_weights = [(i/s).numpy()[0] for i in dummy_weights]
+        mat = np.reshape(np.array(dummy_weights),(int(np.sqrt(n)),int(np.sqrt(n))))
+        print(255*mat)
+        cv2.imwrite("Attention.png",5e4*mat)
+        cv2.imwrite("Temp.png", 1000*temp)
+    return mat
 
 
 if __name__ == '__main__':

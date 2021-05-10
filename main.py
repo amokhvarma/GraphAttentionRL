@@ -38,7 +38,7 @@ for i in range(0,number_of_games):
         old_state = state
         feat1 = make_graph(old_state,50)
         action = Agent.act(feat1)
-        print(action)
+        #print(action)
         (next_state,reward,done,info) = env.step(action)
         #print(reward)
         if(reward==10):

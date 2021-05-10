@@ -57,10 +57,11 @@ class GAT(torch.nn.Module):
         self.hid = 12
 
         self.input_dim = 50
-        self.in_head = 8
+        self.in_head = 1
         self.out_head = 1
         self.num_features = 3
-
+        self.l = None
+        self.r=  None
         self.conv_output = 8
         self.attention = None
 
@@ -78,7 +79,7 @@ class GAT(torch.nn.Module):
         # One can skip them if the dataset is sufficiently large.
 
         x = F.dropout(x, p=0.6, training=self.training)
-        x,self.attention = self.conv1(x, edge_index,return_attention_weights=True)
+        x,self.attention,self.l,self.r = self.conv1(x, edge_index,return_attention_weights=True)
         x = F.elu(x)
         x = F.dropout(x, p=0.6, training=self.training)
         x = self.conv2(x, edge_index)

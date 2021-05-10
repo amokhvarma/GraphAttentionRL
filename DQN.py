@@ -5,7 +5,7 @@ import numpy as np
 from collections import deque
 import torch.optim as  optim
 import torch.nn.functional as F
-from graphgen import make_graph
+from graphgen import make_graph,attention_calc
 class DQN():
     def __init__(self,state_dim=50,num_actions=4,type = "GAT"):
         self.input_dim = state_dim
@@ -77,8 +77,8 @@ if __name__ == "__main__":
     for i in range(1,100):
         a = np.random.randn(100,60,3)
         b = np.random.randn(100,60,3)
-        t_a = make_graph(a,30)
-        t_b = make_graph(b,30)
+        t_a = make_graph(a,50)
+        t_b = make_graph(b,50)
         r = np.random.uniform(0,1)
         done = False
         action = random.sample([0,1,2,3],1)[0]
@@ -86,4 +86,4 @@ if __name__ == "__main__":
         if(i%40==0):
             print(Agent.replay())
 
-    print(Agent.model.attention[1].shape,Agent.model.attention[0])
+    attention_calc(Agent.model.l,Agent.model.r,1265)
