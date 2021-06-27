@@ -4,4 +4,4 @@ This paper talks about the use of Graph Attention Networks
 of network modifications is generally to enhance performance, this paper does not solely aim to do. It instead talks
 about the insights one can get from the parameters (attention weights, in this particular case) learnt while training.
 OpenAI’s MsPacmanV0 environment has been used for interacting with the model.
-The report can be found [here](COL868_Graph_Based_Attention_For_RL.pdf). 
+The report can be found [here](Report.pdf). 
